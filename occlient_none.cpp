@@ -32,6 +32,8 @@
 #include <windows.h>
 #endif
 #include <logger.h>
+#include "ocpayload.h"
+#include "payload_logging.h"
 
 #define TAG ("occlient")
 
@@ -42,6 +44,28 @@ void handleSigInt(int signum) {
     if (signum == SIGINT) {
         gQuitFlag = 1;
     }
+}
+
+OCStackApplicationResult PlatformDiscoveryReqCB(void* ctx,
+                                                OCDoHandle /*handle*/,
+                                                OCClientResponse * clientResponse)
+{
+    if (ctx == (void*) 0x99)
+    {
+        OIC_LOG(INFO, TAG, "Callback Context for Platform DISCOVER query recvd successfully");
+    }
+
+    if (clientResponse)
+    {
+        OIC_LOG(INFO, TAG, ("Discovery Response:"));
+        OIC_LOG_PAYLOAD(INFO, clientResponse->payload);
+    }
+    else
+    {
+        OIC_LOG_V(INFO, TAG, "PlatformDiscoveryReqCB received Null clientResponse");
+    }
+
+    return OC_STACK_KEEP_TRANSACTION;
 }
 
 // This is a function called back when a device is discovered
@@ -57,6 +81,11 @@ OCStackApplicationResult applicationDiscoverCB(
     return OC_STACK_KEEP_TRANSACTION;
 }
 
+//Callback function ¸¸µé°Í.
+void getReqCb() {
+
+}
+
 int main() {
     OIC_LOG_V(INFO, TAG, "Starting occlient");
 
@@ -65,12 +94,18 @@ int main() {
         OIC_LOG(ERROR, TAG, "OCStack init error");
         return 0;
     }
+    OCDoHandle handle;
+    OCCallbackData cbData;
+
+    cbData.cb = PlatformDiscoveryReqCB;
+    cbData.context = (void*)0x99;
+    cbData.cd = NULL;
 
     /* Start a discovery query*/
     char szQueryUri[MAX_QUERY_LENGTH] = { 0 };
-    strcpy(szQueryUri, OC_MULTICAST_DISCOVERY_URI);
-    if (OCDoResource(NULL, OC_REST_GET, szQueryUri, 0, 0, 
-            CT_DEFAULT, OC_LOW_QOS, 0, 0, 0) != OC_STACK_OK) {
+    strcpy(szQueryUri, "/oic/res");
+    if (OCDoRequest(NULL, OC_REST_DISCOVER, szQueryUri, NULL, 0,
+            CT_DEFAULT, OC_LOW_QOS, &cbData, NULL, 0) != OC_STACK_OK) {
         OIC_LOG(ERROR, TAG, "OCStack resource error");
         return 0;
     }

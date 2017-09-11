@@ -57,7 +57,5 @@ ocsample_env.AppendUnique(LIBPATH = [
 ######################################################################
 # Source files and Targets
 ######################################################################
-occlient = ocsample_env.Program('occlient', ['occlient.c'])
-ocserver = ocsample_env.Program('ocserver', ['ocserver.c'])
-occlient_none = ocsample_env.Program('occlient_none', ['occlient_none.cpp'])
-ocserver_none = ocsample_env.Program('ocserver_none', ['ocserver_none.cpp'])
+occlient = ocsample_env.Program('occlient', ['occlient_none.cpp'])
+ocserver = ocsample_env.Program('ocserver', ['ocserver_none.cpp'])
