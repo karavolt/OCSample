@@ -49,7 +49,7 @@ static char discoveryAddr[100];
 static char * coapServerResource = "/a/light";
 
 int gQuitFlag = 0;
-
+bool send = false;
 /* SIGINT handler: set gQuitFlag to 1 for graceful termination */
 void handleSigInt(int signum) {
     if (signum == SIGINT) {
@@ -136,6 +136,7 @@ OCStackApplicationResult discoveryReqCB(void* ctx,
                                                 OCDoHandle /*handle*/,
                                                 OCClientResponse * clientResponse)
 {
+    printf("in discovery CB");
     if (ctx == (void*)DEFAULT_CONTEXT_VALUE)
     {
         OIC_LOG(INFO, TAG, "Callback Context for Platform DISCOVER query recvd successfully");
@@ -146,8 +147,26 @@ OCStackApplicationResult discoveryReqCB(void* ctx,
         OIC_LOG(INFO, TAG, ("Discovery Response:"));
         OIC_LOG_PAYLOAD(INFO, clientResponse->payload);
 
-                ConnType = clientResponse->connType;
-                serverAddr = clientResponse->devAddr;
+        ConnType = clientResponse->connType;
+        serverAddr = clientResponse->devAddr;
+
+//        if(!send) {
+            printf("send get req");
+            OIC_LOG(INFO, TAG, "Starting get Req");
+            OCDoHandle handle;
+            OCCallbackData cbDataGet;
+
+            cbDataGet.cb = getReqCB;
+             cbDataGet.context = (void*)DEFAULT_CONTEXT_VALUE;
+            cbDataGet.cd = NULL;
+             // Start a get query
+             if (OCDoRequest(&handle, OC_REST_GET, coapServerResource, &serverAddr, 0,
+                CT_DEFAULT, OC_LOW_QOS, &cbDataGet, NULL, 0) != OC_STACK_OK) {
+                    OIC_LOG(ERROR, TAG, "OCStack resource error");
+                    return OC_STACK_DELETE_TRANSACTION;
+            }
+            send = true;
+//        }
     }
     else
     {
@@ -155,19 +174,7 @@ OCStackApplicationResult discoveryReqCB(void* ctx,
 		return   OC_STACK_DELETE_TRANSACTION;
     }
 
-    OIC_LOG(INFO, TAG, "Starting get Req");
-    OCDoHandle handle;
-    OCCallbackData cbDataGet;
-
-    cbDataGet.cb = getReqCB;
-    cbDataGet.context = (void*)DEFAULT_CONTEXT_VALUE;
-    cbDataGet.cd = NULL;
-    /* Start a get query*/
-    if (OCDoRequest(&handle, OC_REST_GET, coapServerResource, &serverAddr, 0,
-            CT_DEFAULT, OC_LOW_QOS, &cbDataGet, NULL, 0) != OC_STACK_OK) {
-            OIC_LOG(ERROR, TAG, "OCStack resource error");
-            return OC_STACK_DELETE_TRANSACTION;
-    }
+    //return OC_STACK_DELETE_TRANSACTION;
     return OC_STACK_KEEP_TRANSACTION;
 }
 
@@ -187,6 +194,7 @@ int main() {
     cbData.context = (void*)DEFAULT_CONTEXT_VALUE;
     cbData.cd = NULL;
 
+    printf("send request discovery");
     /* Start a discovery query*/
     if (OCDoRequest(NULL, OC_REST_DISCOVER, RESOURCE_DISCOVERY_QUERY, NULL, 0,
             CT_DEFAULT, OC_LOW_QOS, &cbData, NULL, 0) != OC_STACK_OK) {

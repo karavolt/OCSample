@@ -128,8 +128,10 @@ OCRepPayload* constructResponse(OCEntityHandlerRequest *ehRequest)
 
 	OCRepPayload* input = reinterpret_cast<OCRepPayload*>(ehRequest->payload);
 
-	LightResource *currLightResource = &Light;
 
+	Light.power = !Light.power;
+        digitalWrite(LED, Light.power);
+	LightResource *currLightResource = &Light;
 	return getPayload(gResourceUri, currLightResource->power);
 }
 
@@ -180,8 +182,7 @@ OCEntityHandlerResult OCEntityHandlerCb(OCEntityHandlerFlag flag,
 		if (OC_REST_GET == entityHandlerRequest->method)
 		{
 			OIC_LOG(INFO, TAG, "Received OC_REST_GET from client");
-			gLedStatus = !gLedStatus;
-			digitalWrite(LED, gLedStatus);
+			printf("get req received");
 			ehResult = ProcessGetRequest(entityHandlerRequest, &payload);
 		}
 		else
