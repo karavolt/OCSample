@@ -42,7 +42,7 @@
 char *gResourceUri = (char *)"/a/light";
 
 int gQuitFlag = 0;
-//OCStackResult createLightResource();
+OCStackResult createLightResource();
 
 typedef struct LIGHTRESOURCE{
     OCResourceHandle handle;
@@ -50,6 +50,18 @@ typedef struct LIGHTRESOURCE{
 } LightResource;
 
 static LightResource Light;
+
+OCStackResult createLightResource() {
+	Light.power = false;
+	OCStackResult res = OCCreateResource(&Light.handle,
+		"core.light",
+		"core.rw",
+		"/a/light",
+		OCEntityHandlerCb,	// cb 만들어서 연결하기.
+		NULL,
+		OC_DISCOVERABLE);
+	return res;
+}
 
 /* SIGINT handler: set gQuitFlag to 1 for graceful termination */
 void handleSigInt(int signum) {
@@ -205,14 +217,4 @@ OCEntityHandlerResult OCEntityHandlerCb(OCEntityHandlerFlag flag,
 	return ehResult;
 }
 
-OCStackResult createLightResource() {
-    Light.power = false;
-    OCStackResult res = OCCreateResource(&Light.handle,
-                    "core.light",
-                    "core.rw",
-                    "/a/light",
-                    OCEntityHandlerCb,	// cb 만들어서 연결하기.
-                    NULL,
-                    OC_DISCOVERABLE);	
-    return res;
-}
+

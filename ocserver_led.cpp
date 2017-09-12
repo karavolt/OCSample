@@ -45,6 +45,7 @@ char *gResourceUri = (char *)"/a/light";
 bool gLedStatus = false;
 
 int gQuitFlag = 0;
+OCStackResult createLightResource();
 
 typedef struct LIGHTRESOURCE{
     OCResourceHandle handle;
@@ -213,14 +214,3 @@ OCEntityHandlerResult OCEntityHandlerCb(OCEntityHandlerFlag flag,
 	return ehResult;
 }
 
-OCStackResult createLightResource() {
-    Light.power = false;
-    OCStackResult res = OCCreateResource(&Light.handle,
-                    "core.light",
-                    "core.rw",
-                    "/a/light",
-                    OCEntityHandlerCb,
-                    NULL,
-                    OC_DISCOVERABLE);
-    return res;
-}
