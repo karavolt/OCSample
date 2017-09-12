@@ -31,6 +31,7 @@ ocsample_env.PrependUnique(CPPPATH = [
     '#/resource/csdk/stack/include',
     '#/resource/csdk/security/include',
     '#/resource/oc_logger/include',
+    '/usr/local/include',
 ])
 
 compiler = ocsample_env.get('CXX')
@@ -43,7 +44,7 @@ if target_os not in ['msys_nt', 'windows']:
     ])
 
 ocsample_env.PrependUnique(LIBS = [
-    'octbstack',
+    'octbstack', 'wiringPi',
 ])
 
 if ocsample_env.get('SECURED') == '1':
@@ -59,3 +60,4 @@ ocsample_env.AppendUnique(LIBPATH = [
 ######################################################################
 occlient = ocsample_env.Program('occlient', ['occlient_none.cpp'])
 ocserver = ocsample_env.Program('ocserver', ['ocserver_none.cpp'])
+ocserver_led = ocsample_env.Program('ocserver_led', ['ocserver_led.cpp'])
