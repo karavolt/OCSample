@@ -1,3 +1,4 @@
+
 //******************************************************************
 //
 // Copyright 2014 Intel Mobile Communications GmbH All Rights Reserved.
@@ -40,7 +41,7 @@
 
 static const char *DEVICE_DISCOVERY_QUERY = "%s/oic/d";
 static const char *PLATFORM_DISCOVERY_QUERY = "%s/oic/p";
-static const char *RESOURCE_DISCOVERY_QUERY = "%s/oic/res";
+static const char *RESOURCE_DISCOVERY_QUERY = "/oic/res";
 
 
 //global
@@ -58,32 +59,63 @@ void handleSigInt(int signum) {
     }
 }
 
-OCStackApplicationResult discoveryReqCB(void* ctx,
-                                                OCDoHandle /*handle*/,
-                                                OCClientResponse * clientResponse)
+
+const char *getResult(OCStackResult result)
 {
-    if (ctx == (void*)DEFAULT_CONTEXT_VALUE)
+    switch (result)
     {
-        OIC_LOG(INFO, TAG, "Callback Context for Platform DISCOVER query recvd successfully");
+        case OC_STACK_OK:
+            return "OC_STACK_OK";
+        case OC_STACK_RESOURCE_CREATED:
+            return "OC_STACK_RESOURCE_CREATED";
+        case OC_STACK_RESOURCE_DELETED:
+            return "OC_STACK_RESOURCE_DELETED";
+        case OC_STACK_RESOURCE_CHANGED:
+            return "OC_STACK_RESOURCE_CHANGED";
+        case OC_STACK_INVALID_URI:
+            return "OC_STACK_INVALID_URI";
+        case OC_STACK_INVALID_QUERY:
+            return "OC_STACK_INVALID_QUERY";
+        case OC_STACK_INVALID_IP:
+            return "OC_STACK_INVALID_IP";
+        case OC_STACK_INVALID_PORT:
+            return "OC_STACK_INVALID_PORT";
+        case OC_STACK_INVALID_CALLBACK:
+            return "OC_STACK_INVALID_CALLBACK";
+        case OC_STACK_INVALID_METHOD:
+            return "OC_STACK_INVALID_METHOD";
+        case OC_STACK_NO_MEMORY:
+            return "OC_STACK_NO_MEMORY";
+        case OC_STACK_COMM_ERROR:
+            return "OC_STACK_COMM_ERROR";
+        case OC_STACK_INVALID_PARAM:
+            return "OC_STACK_INVALID_PARAM";
+        case OC_STACK_NOTIMPL:
+            return "OC_STACK_NOTIMPL";
+        case OC_STACK_NO_RESOURCE:
+            return "OC_STACK_NO_RESOURCE";
+        case OC_STACK_RESOURCE_ERROR:
+            return "OC_STACK_RESOURCE_ERROR";
+        case OC_STACK_SLOW_RESOURCE:
+            return "OC_STACK_SLOW_RESOURCE";
+        case OC_STACK_NO_OBSERVERS:
+            return "OC_STACK_NO_OBSERVERS";
+        case OC_STACK_UNAUTHORIZED_REQ:
+            return "OC_STACK_UNAUTHORIZED_REQ";
+        case OC_STACK_NOT_ACCEPTABLE:
+            return "OC_STACK_NOT_ACCEPTABLE";
+#ifdef WITH_PRESENCE
+        case OC_STACK_PRESENCE_STOPPED:
+            return "OC_STACK_PRESENCE_STOPPED";
+        case OC_STACK_PRESENCE_TIMEOUT:
+            return "OC_STACK_PRESENCE_TIMEOUT";
+#endif
+        case OC_STACK_ERROR:
+            return "OC_STACK_ERROR";
+        default:
+            return "UNKNOWN";
     }
-
-    if (clientResponse)
-    {
-        OIC_LOG(INFO, TAG, ("Discovery Response:"));
-        OIC_LOG_PAYLOAD(INFO, clientResponse->payload);
-
-		ConnType = clientResponse->connType;
-		serverAddr = clientResponse->devAddr;
-    }
-    else
-    {
-        OIC_LOG_V(INFO, TAG, "PlatformDiscoveryReqCB received Null clientResponse");
-    }
-
-    return OC_STACK_KEEP_TRANSACTION;
 }
-
-
 
 // This is a function called back when a device is discovered
 OCStackApplicationResult getReqCB(void* ctx, OCDoHandle /*handle*/,
@@ -108,9 +140,42 @@ OCStackApplicationResult getReqCB(void* ctx, OCDoHandle /*handle*/,
     //return OC_STACK_KEEP_TRANSACTION;
 }
 
-//Callback function ¸¸µé°Í.
-void getReqCb() {
+OCStackApplicationResult discoveryReqCB(void* ctx,
+                                                OCDoHandle /*handle*/,
+                                                OCClientResponse * clientResponse)
+{
+    if (ctx == (void*)DEFAULT_CONTEXT_VALUE)
+    {
+        OIC_LOG(INFO, TAG, "Callback Context for Platform DISCOVER query recvd successfully");
+    }
 
+    if (clientResponse)
+    {
+        OIC_LOG(INFO, TAG, ("Discovery Response:"));
+        OIC_LOG_PAYLOAD(INFO, clientResponse->payload);
+
+                ConnType = clientResponse->connType;
+                serverAddr = clientResponse->devAddr;
+    }
+    else
+    {
+        OIC_LOG_V(INFO, TAG, "PlatformDiscoveryReqCB received Null clientResponse");
+    }
+
+    OIC_LOG(INFO, TAG, "Starting get Req");
+    OCDoHandle handle;
+    OCCallbackData cbDataGet;
+
+    cbDataGet.cb = getReqCB;
+    cbDataGet.context = (void*)DEFAULT_CONTEXT_VALUE;
+    cbDataGet.cd = NULL;
+    /* Start a get query*/
+    if (OCDoRequest(&handle, OC_REST_GET, coapServerResource, &serverAddr, 0,
+            CT_DEFAULT, OC_LOW_QOS, &cbDataGet, NULL, 0) != OC_STACK_OK) {
+            OIC_LOG(ERROR, TAG, "OCStack resource error");
+            return OC_STACK_DELETE_TRANSACTION;
+    }
+    return OC_STACK_KEEP_TRANSACTION;
 }
 
 int main() {
@@ -122,6 +187,7 @@ int main() {
         return 0;
     }
     
+    OIC_LOG(INFO, TAG, "Starting discovery Req");
     OCCallbackData cbData;
 
     cbData.cb = discoveryReqCB;
@@ -134,20 +200,21 @@ int main() {
         OIC_LOG(ERROR, TAG, "OCStack resource error");
         return 0;
     }
-	
+/*
+    OIC_LOG(INFO, TAG, "Starting get Req");
 	OCDoHandle handle;
 	OCCallbackData cbDataGet;
 
 	cbDataGet.cb = getReqCB;
 	cbDataGet.context = (void*)DEFAULT_CONTEXT_VALUE;
 	cbDataGet.cd = NULL;
-	/* Start a get query*/
-	if (OCDoRequest(&handle, OC_REST_GET, coapServerResource, serverAddr, 0,
+	// Start a get query
+	if (OCDoRequest(&handle, OC_REST_GET, coapServerResource, &serverAddr, 0,
 		CT_DEFAULT, OC_LOW_QOS, &cbDataGet, NULL, 0) != OC_STACK_OK) {
 		OIC_LOG(ERROR, TAG, "OCStack resource error");
 		return 0;
 	}
-
+*/
     // Break from loop with Ctrl+C
     OIC_LOG(INFO, TAG, "Entering occlient main loop...");
     signal(SIGINT, handleSigInt);
