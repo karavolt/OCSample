@@ -39,8 +39,6 @@
 #define TAG ("occlient")
 #define DEFAULT_CONTEXT_VALUE 0x99
 
-static const char *DEVICE_DISCOVERY_QUERY = "%s/oic/d";
-static const char *PLATFORM_DISCOVERY_QUERY = "%s/oic/p";
 static const char *RESOURCE_DISCOVERY_QUERY = "/oic/res";
 
 
@@ -104,12 +102,6 @@ const char *getResult(OCStackResult result)
             return "OC_STACK_UNAUTHORIZED_REQ";
         case OC_STACK_NOT_ACCEPTABLE:
             return "OC_STACK_NOT_ACCEPTABLE";
-#ifdef WITH_PRESENCE
-        case OC_STACK_PRESENCE_STOPPED:
-            return "OC_STACK_PRESENCE_STOPPED";
-        case OC_STACK_PRESENCE_TIMEOUT:
-            return "OC_STACK_PRESENCE_TIMEOUT";
-#endif
         case OC_STACK_ERROR:
             return "OC_STACK_ERROR";
         default:
@@ -160,6 +152,7 @@ OCStackApplicationResult discoveryReqCB(void* ctx,
     else
     {
         OIC_LOG_V(INFO, TAG, "PlatformDiscoveryReqCB received Null clientResponse");
+		return   OC_STACK_DELETE_TRANSACTION;
     }
 
     OIC_LOG(INFO, TAG, "Starting get Req");
@@ -200,21 +193,7 @@ int main() {
         OIC_LOG(ERROR, TAG, "OCStack resource error");
         return 0;
     }
-/*
-    OIC_LOG(INFO, TAG, "Starting get Req");
-	OCDoHandle handle;
-	OCCallbackData cbDataGet;
 
-	cbDataGet.cb = getReqCB;
-	cbDataGet.context = (void*)DEFAULT_CONTEXT_VALUE;
-	cbDataGet.cd = NULL;
-	// Start a get query
-	if (OCDoRequest(&handle, OC_REST_GET, coapServerResource, &serverAddr, 0,
-		CT_DEFAULT, OC_LOW_QOS, &cbDataGet, NULL, 0) != OC_STACK_OK) {
-		OIC_LOG(ERROR, TAG, "OCStack resource error");
-		return 0;
-	}
-*/
     // Break from loop with Ctrl+C
     OIC_LOG(INFO, TAG, "Entering occlient main loop...");
     signal(SIGINT, handleSigInt);

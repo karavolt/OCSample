@@ -45,7 +45,6 @@ char *gResourceUri = (char *)"/a/light";
 bool gLedStatus = false;
 
 int gQuitFlag = 0;
-//OCStackResult createLightResource();
 
 typedef struct LIGHTRESOURCE{
     OCResourceHandle handle;
@@ -72,9 +71,7 @@ int main() {
         OIC_LOG(ERROR, TAG, "OCStack init error");
         return 0;
     }
-
-
-
+	
     /*
      * Declare and create the example resource: Light
      */
@@ -116,7 +113,6 @@ OCRepPayload* getPayload(const char* uri, bool power)
 
 	OCRepPayloadSetUri(payload, uri);
 	OCRepPayloadSetPropBool(payload, "power", power);
-	//OCRepPayloadSetPropInt(payload, "power", power);
 
 	return payload;
 }
@@ -147,8 +143,7 @@ OCEntityHandlerResult ProcessGetRequest(OCEntityHandlerRequest *ehRequest,
 		OIC_LOG(ERROR, TAG, "constructResponse failed");
 		return OC_EH_ERROR;
 	}
-	gLedStatus = !gLedStatus;
-	digitalWrite(LED,gLedStatus);
+	
 	*payload = getResp;
 	ehResult = OC_EH_OK;
 
@@ -184,6 +179,8 @@ OCEntityHandlerResult OCEntityHandlerCb(OCEntityHandlerFlag flag,
 		if (OC_REST_GET == entityHandlerRequest->method)
 		{
 			OIC_LOG(INFO, TAG, "Received OC_REST_GET from client");
+			gLedStatus = !gLedStatus;
+			digitalWrite(LED, gLedStatus);
 			ehResult = ProcessGetRequest(entityHandlerRequest, &payload);
 		}
 		else
@@ -211,36 +208,19 @@ OCEntityHandlerResult OCEntityHandlerCb(OCEntityHandlerFlag flag,
 			ehResult = OC_EH_ERROR;
 		}
 	}
-/*
-	if (flag & OC_OBSERVE_FLAG)
-	{
-		OIC_LOG(INFO, TAG, "Flag includes OC_OBSERVE_FLAG");
 
-		if (OC_OBSERVE_REGISTER == entityHandlerRequest->obsInfo.action)
-		{
-			OIC_LOG(INFO, TAG, "Received OC_OBSERVE_REGISTER from client");
-			ProcessObserveRegister(entityHandlerRequest);
-		}
-		else if (OC_OBSERVE_DEREGISTER == entityHandlerRequest->obsInfo.action)
-		{
-			OIC_LOG(INFO, TAG, "Received OC_OBSERVE_DEREGISTER from client");
-			ProcessObserveDeregister(entityHandlerRequest);
-		}
-	}
-*/
 	OCPayloadDestroy(response.payload);
 	return ehResult;
 }
 
 OCStackResult createLightResource() {
     Light.power = false;
-    OCStackResult res = OCCreateResourceWithEp(&Light.handle,
+    OCStackResult res = OCCreateResource(&Light.handle,
                     "core.light",
                     "core.rw",
                     "/a/light",
-                    OCEntityHandlerCb,	// cb 만들어서 연결하기.
+                    OCEntityHandlerCb,
                     NULL,
-                    OC_DISCOVERABLE | OC_OBSERVABLE,
-					OC_ALL);	// obs말고 discoverable
+                    OC_DISCOVERABLE);
     return res;
 }

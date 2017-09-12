@@ -42,7 +42,7 @@
 char *gResourceUri = (char *)"/a/light";
 
 int gQuitFlag = 0;
-OCStackResult createLightResource();
+//OCStackResult createLightResource();
 
 typedef struct LIGHTRESOURCE{
     OCResourceHandle handle;
@@ -200,36 +200,19 @@ OCEntityHandlerResult OCEntityHandlerCb(OCEntityHandlerFlag flag,
 			ehResult = OC_EH_ERROR;
 		}
 	}
-/*
-	if (flag & OC_OBSERVE_FLAG)
-	{
-		OIC_LOG(INFO, TAG, "Flag includes OC_OBSERVE_FLAG");
 
-		if (OC_OBSERVE_REGISTER == entityHandlerRequest->obsInfo.action)
-		{
-			OIC_LOG(INFO, TAG, "Received OC_OBSERVE_REGISTER from client");
-			ProcessObserveRegister(entityHandlerRequest);
-		}
-		else if (OC_OBSERVE_DEREGISTER == entityHandlerRequest->obsInfo.action)
-		{
-			OIC_LOG(INFO, TAG, "Received OC_OBSERVE_DEREGISTER from client");
-			ProcessObserveDeregister(entityHandlerRequest);
-		}
-	}
-*/
 	OCPayloadDestroy(response.payload);
 	return ehResult;
 }
 
 OCStackResult createLightResource() {
     Light.power = false;
-    OCStackResult res = OCCreateResourceWithEp(&Light.handle,
+    OCStackResult res = OCCreateResource(&Light.handle,
                     "core.light",
                     "core.rw",
                     "/a/light",
                     OCEntityHandlerCb,	// cb 만들어서 연결하기.
                     NULL,
-                    OC_DISCOVERABLE | OC_OBSERVABLE,
-					OC_ALL);	// obs말고 discoverable
+                    OC_DISCOVERABLE);	
     return res;
 }
