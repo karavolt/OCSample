@@ -45,7 +45,7 @@ char *gResourceUri = (char *)"/a/light";
 bool gLedStatus = false;
 
 int gQuitFlag = 0;
-OCStackResult createLightResource();
+//OCStackResult createLightResource();
 
 typedef struct LIGHTRESOURCE{
     OCResourceHandle handle;
