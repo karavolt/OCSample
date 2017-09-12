@@ -37,6 +37,16 @@
 
 #define TAG ("occlient")
 
+static const char *DEVICE_DISCOVERY_QUERY = "%s/oic/d";
+static const char *PLATFORM_DISCOVERY_QUERY = "%s/oic/p";
+static const char *RESOURCE_DISCOVERY_QUERY = "%s/oic/res";
+
+//global
+static OCConnectivityType ConnType = CT_ADAPTER_IP;
+static OCDevAddr serverAddr;
+static char discoveryAddr[100];
+static char * coapServerResource = "/a/light";
+
 int gQuitFlag = 0;
 
 /* SIGINT handler: set gQuitFlag to 1 for graceful termination */
@@ -46,7 +56,7 @@ void handleSigInt(int signum) {
     }
 }
 
-OCStackApplicationResult PlatformDiscoveryReqCB(void* ctx,
+OCStackApplicationResult discoveryReqCB(void* ctx,
                                                 OCDoHandle /*handle*/,
                                                 OCClientResponse * clientResponse)
 {
@@ -59,6 +69,9 @@ OCStackApplicationResult PlatformDiscoveryReqCB(void* ctx,
     {
         OIC_LOG(INFO, TAG, ("Discovery Response:"));
         OIC_LOG_PAYLOAD(INFO, clientResponse->payload);
+
+		ConnType = clientResponse->connType;
+		serverAddr = clientResponse->devAddr;
     }
     else
     {
@@ -68,17 +81,29 @@ OCStackApplicationResult PlatformDiscoveryReqCB(void* ctx,
     return OC_STACK_KEEP_TRANSACTION;
 }
 
+
+
 // This is a function called back when a device is discovered
-OCStackApplicationResult applicationDiscoverCB(
-        OCClientResponse * clientResponse) {
-    (void)clientResponse;
-    OIC_LOG(INFO, TAG, "Entering applicationDiscoverCB (Application Layer CB)");
-    OIC_LOG_V(INFO, TAG, "Device =============> Discovered %s @ %s:%d",
-                                    clientResponse->resourceUri,
-                                    clientResponse->devAddr.addr,
-                                    clientResponse->devAddr.port);
-    //return OC_STACK_DELETE_TRANSACTION;
-    return OC_STACK_KEEP_TRANSACTION;
+OCStackApplicationResult getReqCB(void* ctx, OCDoHandle /*handle*/,
+	OCClientResponse * clientResponse)
+{
+	if (clientResponse == NULL)
+	{
+		OIC_LOG(INFO, TAG, "getReqCB received NULL clientResponse");
+		return   OC_STACK_DELETE_TRANSACTION;
+	}
+	if (ctx == (void*)DEFAULT_CONTEXT_VALUE)
+	{
+		OIC_LOG(INFO, TAG, "Callback Context for GET query recvd successfully");
+	}
+    
+	OIC_LOG_V(INFO, TAG, "StackResult: %s", getResult(clientResponse->result));
+	OIC_LOG_V(INFO, TAG, "SEQUENCE NUMBER: %d", clientResponse->sequenceNumber);
+	OIC_LOG_PAYLOAD(INFO, clientResponse->payload);
+	OIC_LOG(INFO, TAG, ("=============> Get Response"));
+
+    return OC_STACK_DELETE_TRANSACTION;
+    //return OC_STACK_KEEP_TRANSACTION;
 }
 
 //Callback function ¸¸µé°Í.
@@ -94,21 +119,32 @@ int main() {
         OIC_LOG(ERROR, TAG, "OCStack init error");
         return 0;
     }
-    OCDoHandle handle;
+    
     OCCallbackData cbData;
 
-    cbData.cb = PlatformDiscoveryReqCB;
+    cbData.cb = discoveryReqCB;
     cbData.context = (void*)0x99;
     cbData.cd = NULL;
 
     /* Start a discovery query*/
-    char szQueryUri[MAX_QUERY_LENGTH] = { 0 };
-    strcpy(szQueryUri, "/oic/res");
-    if (OCDoRequest(NULL, OC_REST_DISCOVER, szQueryUri, NULL, 0,
+    if (OCDoRequest(NULL, OC_REST_DISCOVER, RESOURCE_DISCOVERY_QUERY, NULL, 0,
             CT_DEFAULT, OC_LOW_QOS, &cbData, NULL, 0) != OC_STACK_OK) {
         OIC_LOG(ERROR, TAG, "OCStack resource error");
         return 0;
     }
+	
+	OCDoHandle handle;
+	OCCallbackData cbDataGet;
+
+	cbDataGet.cb = getReqCB;
+	cbDataGet.context = (void*)0x99;
+	cbDataGet.cd = NULL;
+	/* Start a get query*/
+	if (OCDoRequest(&handle, OC_REST_GET, coapServerResource, serverAddr, 0,
+		CT_DEFAULT, OC_LOW_QOS, &cbDataGet, NULL, 0) != OC_STACK_OK) {
+		OIC_LOG(ERROR, TAG, "OCStack resource error");
+		return 0;
+	}
 
     // Break from loop with Ctrl+C
     OIC_LOG(INFO, TAG, "Entering occlient main loop...");
