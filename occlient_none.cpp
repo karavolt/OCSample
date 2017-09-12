@@ -52,61 +52,61 @@ int gQuitFlag = 0;
 bool send = false;
 /* SIGINT handler: set gQuitFlag to 1 for graceful termination */
 void handleSigInt(int signum) {
-    if (signum == SIGINT) {
-        gQuitFlag = 1;
-    }
-}
+	if (signum == SIGINT) {
+		gQuitFlag = 1;
+	}
+}}
 
 
 const char *getResult(OCStackResult result)
 {
-    switch (result)
-    {
-        case OC_STACK_OK:
-            return "OC_STACK_OK";
-        case OC_STACK_RESOURCE_CREATED:
-            return "OC_STACK_RESOURCE_CREATED";
-        case OC_STACK_RESOURCE_DELETED:
-            return "OC_STACK_RESOURCE_DELETED";
-        case OC_STACK_RESOURCE_CHANGED:
-            return "OC_STACK_RESOURCE_CHANGED";
-        case OC_STACK_INVALID_URI:
-            return "OC_STACK_INVALID_URI";
-        case OC_STACK_INVALID_QUERY:
-            return "OC_STACK_INVALID_QUERY";
-        case OC_STACK_INVALID_IP:
-            return "OC_STACK_INVALID_IP";
-        case OC_STACK_INVALID_PORT:
-            return "OC_STACK_INVALID_PORT";
-        case OC_STACK_INVALID_CALLBACK:
-            return "OC_STACK_INVALID_CALLBACK";
-        case OC_STACK_INVALID_METHOD:
-            return "OC_STACK_INVALID_METHOD";
-        case OC_STACK_NO_MEMORY:
-            return "OC_STACK_NO_MEMORY";
-        case OC_STACK_COMM_ERROR:
-            return "OC_STACK_COMM_ERROR";
-        case OC_STACK_INVALID_PARAM:
-            return "OC_STACK_INVALID_PARAM";
-        case OC_STACK_NOTIMPL:
-            return "OC_STACK_NOTIMPL";
-        case OC_STACK_NO_RESOURCE:
-            return "OC_STACK_NO_RESOURCE";
-        case OC_STACK_RESOURCE_ERROR:
-            return "OC_STACK_RESOURCE_ERROR";
-        case OC_STACK_SLOW_RESOURCE:
-            return "OC_STACK_SLOW_RESOURCE";
-        case OC_STACK_NO_OBSERVERS:
-            return "OC_STACK_NO_OBSERVERS";
-        case OC_STACK_UNAUTHORIZED_REQ:
-            return "OC_STACK_UNAUTHORIZED_REQ";
-        case OC_STACK_NOT_ACCEPTABLE:
-            return "OC_STACK_NOT_ACCEPTABLE";
-        case OC_STACK_ERROR:
-            return "OC_STACK_ERROR";
-        default:
-            return "UNKNOWN";
-    }
+	switch (result)
+	{
+	case OC_STACK_OK:
+		return "OC_STACK_OK";
+	case OC_STACK_RESOURCE_CREATED:
+		return "OC_STACK_RESOURCE_CREATED";
+	case OC_STACK_RESOURCE_DELETED:
+		return "OC_STACK_RESOURCE_DELETED";
+	case OC_STACK_RESOURCE_CHANGED:
+		return "OC_STACK_RESOURCE_CHANGED";
+	case OC_STACK_INVALID_URI:
+		return "OC_STACK_INVALID_URI";
+	case OC_STACK_INVALID_QUERY:
+		return "OC_STACK_INVALID_QUERY";
+	case OC_STACK_INVALID_IP:
+		return "OC_STACK_INVALID_IP";
+	case OC_STACK_INVALID_PORT:
+		return "OC_STACK_INVALID_PORT";
+	case OC_STACK_INVALID_CALLBACK:
+		return "OC_STACK_INVALID_CALLBACK";
+	case OC_STACK_INVALID_METHOD:
+		return "OC_STACK_INVALID_METHOD";
+	case OC_STACK_NO_MEMORY:
+		return "OC_STACK_NO_MEMORY";
+	case OC_STACK_COMM_ERROR:
+		return "OC_STACK_COMM_ERROR";
+	case OC_STACK_INVALID_PARAM:
+		return "OC_STACK_INVALID_PARAM";
+	case OC_STACK_NOTIMPL:
+		return "OC_STACK_NOTIMPL";
+	case OC_STACK_NO_RESOURCE:
+		return "OC_STACK_NO_RESOURCE";
+	case OC_STACK_RESOURCE_ERROR:
+		return "OC_STACK_RESOURCE_ERROR";
+	case OC_STACK_SLOW_RESOURCE:
+		return "OC_STACK_SLOW_RESOURCE";
+	case OC_STACK_NO_OBSERVERS:
+		return "OC_STACK_NO_OBSERVERS";
+	case OC_STACK_UNAUTHORIZED_REQ:
+		return "OC_STACK_UNAUTHORIZED_REQ";
+	case OC_STACK_NOT_ACCEPTABLE:
+		return "OC_STACK_NOT_ACCEPTABLE";
+	case OC_STACK_ERROR:
+		return "OC_STACK_ERROR";
+	default:
+		return "UNKNOWN";
+	}
 }
 
 // This is a function called back when a device is discovered
@@ -122,105 +122,102 @@ OCStackApplicationResult getReqCB(void* ctx, OCDoHandle /*handle*/,
 	{
 		OIC_LOG(INFO, TAG, "Callback Context for GET query recvd successfully");
 	}
-    
+
 	OIC_LOG_V(INFO, TAG, "StackResult: %s", getResult(clientResponse->result));
 	OIC_LOG_V(INFO, TAG, "SEQUENCE NUMBER: %d", clientResponse->sequenceNumber);
 	OIC_LOG_PAYLOAD(INFO, clientResponse->payload);
 	OIC_LOG(INFO, TAG, ("=============> Get Response"));
 
-    return OC_STACK_DELETE_TRANSACTION;
-    //return OC_STACK_KEEP_TRANSACTION;
+	return OC_STACK_DELETE_TRANSACTION;
+	//return OC_STACK_KEEP_TRANSACTION;
 }
 
 OCStackApplicationResult discoveryReqCB(void* ctx,
-                                                OCDoHandle /*handle*/,
-                                                OCClientResponse * clientResponse)
+	OCDoHandle /*handle*/,
+	OCClientResponse * clientResponse)
 {
-    printf("in discovery CB");
-    if (ctx == (void*)DEFAULT_CONTEXT_VALUE)
-    {
-        OIC_LOG(INFO, TAG, "Callback Context for Platform DISCOVER query recvd successfully");
-    }
+	printf("in discovery CB");
+	if (ctx == (void*)DEFAULT_CONTEXT_VALUE)
+	{
+		OIC_LOG(INFO, TAG, "Callback Context for Platform DISCOVER query recvd successfully");
+	}
 
-    if (clientResponse)
-    {
-        OIC_LOG(INFO, TAG, ("Discovery Response:"));
-        OIC_LOG_PAYLOAD(INFO, clientResponse->payload);
+	if (clientResponse)
+	{
+		OIC_LOG(INFO, TAG, ("Discovery Response:"));
+		OIC_LOG_PAYLOAD(INFO, clientResponse->payload);
 
-        ConnType = clientResponse->connType;
-        serverAddr = clientResponse->devAddr;
+		ConnType = clientResponse->connType;
+		serverAddr = clientResponse->devAddr;
 
-//        if(!send) {
-            printf("send get req");
-            OIC_LOG(INFO, TAG, "Starting get Req");
-            OCDoHandle handle;
-            OCCallbackData cbDataGet;
+		printf("send get req");
+		OIC_LOG(INFO, TAG, "Starting get Req");
+		OCDoHandle handle;
+		OCCallbackData cbDataGet;
 
-            cbDataGet.cb = getReqCB;
-             cbDataGet.context = (void*)DEFAULT_CONTEXT_VALUE;
-            cbDataGet.cd = NULL;
-             // Start a get query
-             if (OCDoRequest(&handle, OC_REST_GET, coapServerResource, &serverAddr, 0,
-                CT_DEFAULT, OC_LOW_QOS, &cbDataGet, NULL, 0) != OC_STACK_OK) {
-                    OIC_LOG(ERROR, TAG, "OCStack resource error");
-                    return OC_STACK_DELETE_TRANSACTION;
-            }
-            send = true;
-//        }
-    }
-    else
-    {
-        OIC_LOG_V(INFO, TAG, "PlatformDiscoveryReqCB received Null clientResponse");
+		cbDataGet.cb = getReqCB;
+		cbDataGet.context = (void*)DEFAULT_CONTEXT_VALUE;
+		cbDataGet.cd = NULL;
+		// Start a get query
+		if (OCDoRequest(&handle, OC_REST_GET, coapServerResource, &serverAddr, 0,
+			CT_DEFAULT, OC_LOW_QOS, &cbDataGet, NULL, 0) != OC_STACK_OK) {
+			OIC_LOG(ERROR, TAG, "OCStack resource error");
+			return OC_STACK_DELETE_TRANSACTION;
+		}
+	}
+	else
+	{
+		OIC_LOG_V(INFO, TAG, "PlatformDiscoveryReqCB received Null clientResponse");
 		return   OC_STACK_DELETE_TRANSACTION;
-    }
+	}
 
-    //return OC_STACK_DELETE_TRANSACTION;
-    return OC_STACK_KEEP_TRANSACTION;
+	//return OC_STACK_DELETE_TRANSACTION;
+	return OC_STACK_KEEP_TRANSACTION;
 }
 
 int main() {
-    OIC_LOG_V(INFO, TAG, "Starting occlient");
+	OIC_LOG_V(INFO, TAG, "Starting occlient");
 
-    /* Initialize OCStack*/
-    if (OCInit(NULL, 0, OC_CLIENT) != OC_STACK_OK) {
-        OIC_LOG(ERROR, TAG, "OCStack init error");
-        return 0;
-    }
-    
-    OIC_LOG(INFO, TAG, "Starting discovery Req");
-    OCCallbackData cbData;
+	/* Initialize OCStack*/
+	if (OCInit(NULL, 0, OC_CLIENT) != OC_STACK_OK) {
+		OIC_LOG(ERROR, TAG, "OCStack init error");
+		return 0;
+	}
 
-    cbData.cb = discoveryReqCB;
-    cbData.context = (void*)DEFAULT_CONTEXT_VALUE;
-    cbData.cd = NULL;
+	OIC_LOG(INFO, TAG, "Starting discovery Req");
+	OCCallbackData cbData;
 
-    printf("send request discovery");
-    /* Start a discovery query*/
-    if (OCDoRequest(NULL, OC_REST_DISCOVER, RESOURCE_DISCOVERY_QUERY, NULL, 0,
-            CT_DEFAULT, OC_LOW_QOS, &cbData, NULL, 0) != OC_STACK_OK) {
-        OIC_LOG(ERROR, TAG, "OCStack resource error");
-        return 0;
-    }
+	cbData.cb = discoveryReqCB;
+	cbData.context = (void*)DEFAULT_CONTEXT_VALUE;
+	cbData.cd = NULL;
 
-    // Break from loop with Ctrl+C
-    OIC_LOG(INFO, TAG, "Entering occlient main loop...");
-    signal(SIGINT, handleSigInt);
-    while (!gQuitFlag) {
+	printf("send request discovery");
+	/* Start a discovery query*/
+	if (OCDoRequest(NULL, OC_REST_DISCOVER, RESOURCE_DISCOVERY_QUERY, NULL, 0,
+		CT_DEFAULT, OC_LOW_QOS, &cbData, NULL, 0) != OC_STACK_OK) {
+		OIC_LOG(ERROR, TAG, "OCStack resource error");
+		return 0;
+	}
 
-        if (OCProcess() != OC_STACK_OK) {
-            OIC_LOG(ERROR, TAG, "OCStack process error");
-            return 0;
-        }
+	// Break from loop with Ctrl+C
+	OIC_LOG(INFO, TAG, "Entering occlient main loop...");
+	signal(SIGINT, handleSigInt);
+	while (!gQuitFlag) {
 
-        sleep(1);
-    }
+		if (OCProcess() != OC_STACK_OK) {
+			OIC_LOG(ERROR, TAG, "OCStack process error");
+			return 0;
+		}
 
-    OIC_LOG(INFO, TAG, "Exiting occlient main loop...");
+		sleep(1);
+	}
 
-    if (OCStop() != OC_STACK_OK) {
-        OIC_LOG(ERROR, TAG, "OCStack stop error");
-    }
+	OIC_LOG(INFO, TAG, "Exiting occlient main loop...");
 
-    return 0;
+	if (OCStop() != OC_STACK_OK) {
+		OIC_LOG(ERROR, TAG, "OCStack stop error");
+	}
+
+	return 0;
 }
 

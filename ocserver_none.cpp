@@ -55,46 +55,46 @@ static LightResource Light;
 
 /* SIGINT handler: set gQuitFlag to 1 for graceful termination */
 void handleSigInt(int signum) {
-    if (signum == SIGINT) {
-        gQuitFlag = 1;
-    }
+	if (signum == SIGINT) {
+		gQuitFlag = 1;
+	}
 }
 
 int main() {
-    OIC_LOG_V(INFO, TAG, "Starting ocserver");
-    if (OCInit(NULL, 0, OC_SERVER) != OC_STACK_OK) {
-        OIC_LOG(ERROR, TAG, "OCStack init error");
-        return 0;
-    }
+	OIC_LOG_V(INFO, TAG, "Starting ocserver");
+	if (OCInit(NULL, 0, OC_SERVER) != OC_STACK_OK) {
+		OIC_LOG(ERROR, TAG, "OCStack init error");
+		return 0;
+	}
 
-    /*
-     * Declare and create the example resource: Light
-     */
-    if(createLightResource() != OC_STACK_OK)
-    {
-        OIC_LOG(ERROR, TAG, "OCStack cannot create resource...");
-    }
+	/*
+	 * Declare and create the example resource: Light
+	 */
+	if (createLightResource() != OC_STACK_OK)
+	{
+		OIC_LOG(ERROR, TAG, "OCStack cannot create resource...");
+	}
 
-    // Break from loop with Ctrl-C
-    OIC_LOG(INFO, TAG, "Entering ocserver main loop...");
-    signal(SIGINT, handleSigInt);
-    while (!gQuitFlag) {
+	// Break from loop with Ctrl-C
+	OIC_LOG(INFO, TAG, "Entering ocserver main loop...");
+	signal(SIGINT, handleSigInt);
+	while (!gQuitFlag) {
 
-        if (OCProcess() != OC_STACK_OK) {
-            OIC_LOG(ERROR, TAG, "OCStack process error");
-            return 0;
-        }
+		if (OCProcess() != OC_STACK_OK) {
+			OIC_LOG(ERROR, TAG, "OCStack process error");
+			return 0;
+		}
 
-        sleep(1);
-    }
+		sleep(1);
+	}
 
-    OIC_LOG(INFO, TAG, "Exiting ocserver main loop...");
+	OIC_LOG(INFO, TAG, "Exiting ocserver main loop...");
 
-    if (OCStop() != OC_STACK_OK) {
-        OIC_LOG(ERROR, TAG, "OCStack process error");
-    }
+	if (OCStop() != OC_STACK_OK) {
+		OIC_LOG(ERROR, TAG, "OCStack process error");
+	}
 
-    return 0;
+	return 0;
 }
 
 OCRepPayload* getPayload(const char* uri, bool power)
