@@ -36,10 +36,12 @@
 #include "payload_logging.h"
 
 #define TAG ("occlient")
+#define DEFAULT_CONTEXT_VALUE 0x99
 
 static const char *DEVICE_DISCOVERY_QUERY = "%s/oic/d";
 static const char *PLATFORM_DISCOVERY_QUERY = "%s/oic/p";
 static const char *RESOURCE_DISCOVERY_QUERY = "%s/oic/res";
+
 
 //global
 static OCConnectivityType ConnType = CT_ADAPTER_IP;
@@ -60,7 +62,7 @@ OCStackApplicationResult discoveryReqCB(void* ctx,
                                                 OCDoHandle /*handle*/,
                                                 OCClientResponse * clientResponse)
 {
-    if (ctx == (void*) 0x99)
+    if (ctx == (void*)DEFAULT_CONTEXT_VALUE)
     {
         OIC_LOG(INFO, TAG, "Callback Context for Platform DISCOVER query recvd successfully");
     }
@@ -123,7 +125,7 @@ int main() {
     OCCallbackData cbData;
 
     cbData.cb = discoveryReqCB;
-    cbData.context = (void*)0x99;
+    cbData.context = (void*)DEFAULT_CONTEXT_VALUE;
     cbData.cd = NULL;
 
     /* Start a discovery query*/
@@ -137,7 +139,7 @@ int main() {
 	OCCallbackData cbDataGet;
 
 	cbDataGet.cb = getReqCB;
-	cbDataGet.context = (void*)0x99;
+	cbDataGet.context = (void*)DEFAULT_CONTEXT_VALUE;
 	cbDataGet.cd = NULL;
 	/* Start a get query*/
 	if (OCDoRequest(&handle, OC_REST_GET, coapServerResource, serverAddr, 0,
