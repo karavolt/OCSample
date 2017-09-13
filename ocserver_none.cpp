@@ -154,14 +154,12 @@ OCEntityHandlerResult OCEntityHandlerCb(OCEntityHandlerFlag flag,
 	OCEntityHandlerResult ehResult = OC_EH_OK;
 	OCEntityHandlerResponse response = { 0, 0, OC_EH_ERROR, 0, 0,{},{ 0 }, false };
 
-	// Validate pointer
 	if (!entityHandlerRequest)
 	{
 		OIC_LOG(ERROR, TAG, "Invalid request pointer");
 		return OC_EH_ERROR;
 	}
 
-	// Initialize certain response fields
 	response.numSendVendorSpecificHeaderOptions = 0;
 	memset(response.sendVendorSpecificHeaderOptions,
 		0, sizeof response.sendVendorSpecificHeaderOptions);
@@ -214,7 +212,7 @@ OCStackResult createLightResource() {
 		"core.light",
 		"core.rw",
 		"/a/light",
-		OCEntityHandlerCb,	// cb 만들어서 연결하기.
+		OCEntityHandlerCb,	
 		NULL,
 		OC_DISCOVERABLE);
 	return res;
