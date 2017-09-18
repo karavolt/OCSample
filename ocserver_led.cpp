@@ -56,51 +56,51 @@ static LightResource Light;
 
 /* SIGINT handler: set gQuitFlag to 1 for graceful termination */
 void handleSigInt(int signum) {
-    if (signum == SIGINT) {
-        gQuitFlag = 1;
-    }
+	if (signum == SIGINT) {
+		gQuitFlag = 1;
+	}
 }
 
 int main() {
-    OIC_LOG(INFO, TAG, "init wiringPi");
+	OIC_LOG(INFO, TAG, "init wiringPi");
 
-    wiringPiSetup () ;
-    pinMode (LED, OUTPUT) ;
+	wiringPiSetup();
+	pinMode(LED, OUTPUT);
 
-    OIC_LOG_V(INFO, TAG, "Starting ocserver");
-    if (OCInit(NULL, 0, OC_SERVER) != OC_STACK_OK) {
-        OIC_LOG(ERROR, TAG, "OCStack init error");
-        return 0;
-    }
-	
-    /*
-     * Declare and create the example resource: Light
-     */
-    if(createLightResource() != OC_STACK_OK)
-    {
-        OIC_LOG(ERROR, TAG, "OCStack cannot create resource...");
-    }
+	OIC_LOG_V(INFO, TAG, "Starting ocserver");
+	if (OCInit(NULL, 0, OC_SERVER) != OC_STACK_OK) {
+		OIC_LOG(ERROR, TAG, "OCStack init error");
+		return 0;
+	}
 
-    // Break from loop with Ctrl-C
-    OIC_LOG(INFO, TAG, "Entering ocserver main loop...");
-    signal(SIGINT, handleSigInt);
-    while (!gQuitFlag) {
+	/*
+	 * Declare and create the example resource: Light
+	 */
+	if (createLightResource() != OC_STACK_OK)
+	{
+		OIC_LOG(ERROR, TAG, "OCStack cannot create resource...");
+	}
 
-        if (OCProcess() != OC_STACK_OK) {
-            OIC_LOG(ERROR, TAG, "OCStack process error");
-            return 0;
-        }
+	// Break from loop with Ctrl-C
+	OIC_LOG(INFO, TAG, "Entering ocserver main loop...");
+	signal(SIGINT, handleSigInt);
+	while (!gQuitFlag) {
 
-        sleep(1);
-    }
+		if (OCProcess() != OC_STACK_OK) {
+			OIC_LOG(ERROR, TAG, "OCStack process error");
+			return 0;
+		}
 
-    OIC_LOG(INFO, TAG, "Exiting ocserver main loop...");
+		sleep(1);
+	}
 
-    if (OCStop() != OC_STACK_OK) {
-        OIC_LOG(ERROR, TAG, "OCStack process error");
-    }
+	OIC_LOG(INFO, TAG, "Exiting ocserver main loop...");
 
-    return 0;
+	if (OCStop() != OC_STACK_OK) {
+		OIC_LOG(ERROR, TAG, "OCStack process error");
+	}
+
+	return 0;
 }
 
 OCRepPayload* getPayload(const char* uri, bool power)
@@ -130,7 +130,7 @@ OCRepPayload* constructResponse(OCEntityHandlerRequest *ehRequest)
 
 
 	Light.power = !Light.power;
-        digitalWrite(LED, Light.power);
+	digitalWrite(LED, Light.power);
 	LightResource *currLightResource = &Light;
 	return getPayload(gResourceUri, currLightResource->power);
 }
@@ -146,7 +146,7 @@ OCEntityHandlerResult ProcessGetRequest(OCEntityHandlerRequest *ehRequest,
 		OIC_LOG(ERROR, TAG, "constructResponse failed");
 		return OC_EH_ERROR;
 	}
-	
+
 	*payload = getResp;
 	ehResult = OC_EH_OK;
 

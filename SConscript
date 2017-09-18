@@ -22,6 +22,7 @@ Import('stacksamples_env')
 ocsample_env = stacksamples_env.Clone()
 
 target_os = stacksamples_env.get('TARGET_OS')
+target_arch = stacksamples_env.get('TARGET_ARCH')
 
 ######################################################################
 # Build flags
@@ -43,8 +44,13 @@ if target_os not in ['msys_nt', 'windows']:
         'connectivity_abstraction',
     ])
 
+if target_arch in ['arm']:
+    ocsample_env.PrependUnique(LIBS = [
+        'wiringPi',
+    ])
+
 ocsample_env.PrependUnique(LIBS = [
-    'octbstack', 'wiringPi',
+    'octbstack',
 ])
 
 if ocsample_env.get('SECURED') == '1':
@@ -60,4 +66,6 @@ ocsample_env.AppendUnique(LIBPATH = [
 ######################################################################
 occlient = ocsample_env.Program('occlient', ['occlient_none.cpp'])
 ocserver = ocsample_env.Program('ocserver', ['ocserver_none.cpp'])
-ocserver_led = ocsample_env.Program('ocserver_led', ['ocserver_led.cpp'])
+
+if target_arch in ['arm']:
+    ocserver_led = ocsample_env.Program('ocserver_led', ['ocserver_led.cpp'])
