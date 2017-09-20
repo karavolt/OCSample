@@ -1,23 +1,22 @@
-//******************************************************************
-//
-// Copyright 2014 Intel Mobile Communications GmbH All Rights Reserved.
-//
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
-//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
+/*
+*
+* Copyright 2017 Broadwave All Rights Reserved.
+*
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*      http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*
+* Author : Jae-hwan kim<karavolt@broadwave.co.kr>
+*/
 
 #include "iotivity_config.h"
 #include "ocstack.h"
@@ -127,11 +126,17 @@ OCRepPayload* constructResponse(OCEntityHandlerRequest *ehRequest)
 	}
 
 	OCRepPayload* input = reinterpret_cast<OCRepPayload*>(ehRequest->payload);
-
-
-	Light.power = !Light.power;
-	digitalWrite(LED, Light.power);
+	
 	LightResource *currLightResource = &Light;
+
+	if (OC_REST_PUT == ehRequest->method)
+	{
+		bool pow;
+		if (OCRepPayloadGetPropBool(input, "power", &pow))
+		{
+			currLightResource->power = pow;
+		}
+	}
 	return getPayload(gResourceUri, currLightResource->power);
 }
 
@@ -139,6 +144,28 @@ OCEntityHandlerResult ProcessGetRequest(OCEntityHandlerRequest *ehRequest,
 	OCRepPayload **payload)
 {
 	OCEntityHandlerResult ehResult;
+
+	OCRepPayload *getResp = constructResponse(ehRequest);
+	if (!getResp)
+	{
+		OIC_LOG(ERROR, TAG, "constructResponse failed");
+		return OC_EH_ERROR;
+	}
+
+	*payload = getResp;
+	ehResult = OC_EH_OK;
+
+	return ehResult;
+}
+
+OCEntityHandlerResult ProcessPutRequest(OCEntityHandlerRequest *ehRequest,
+	OCRepPayload **payload)
+{
+	OCEntityHandlerResult ehResult;
+
+	// control LED
+	Light.power = !Light.power;
+	digitalWrite(LED, Light.power);
 
 	OCRepPayload *getResp = constructResponse(ehRequest);
 	if (!getResp)
@@ -184,6 +211,12 @@ OCEntityHandlerResult OCEntityHandlerCb(OCEntityHandlerFlag flag,
 			OIC_LOG(INFO, TAG, "Received OC_REST_GET from client");
 			printf("get req received");
 			ehResult = ProcessGetRequest(entityHandlerRequest, &payload);
+		}
+		else if (OC_REST_PUT == entityHandlerRequest->method)
+		{
+			OIC_LOG(INFO, TAG, "Received OC_REST_GET from client");
+			printf("get req received");
+			ehResult = ProcessPutRequest(entityHandlerRequest, &payload);
 		}
 		else
 		{
